@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Loading</title>
+<style>
+  html,body{height:100%;margin:0;background:#000}
+  video{position:fixed;inset:0;width:100%;height:100%;object-fit:cover}
+</style>
+</head>
+<body>
+<video id="v" src="load.mp4" autoplay playsinline muted preload="auto"></video>
+<script>
+(function(){
+  const v = document.getElementById('v');
+  function tryFull(){ if(v.requestFullscreen) v.requestFullscreen().catch(()=>{}); else if(v.webkitEnterFullscreen) v.webkitEnterFullscreen(); }
+  v.addEventListener('loadedmetadata', ()=>{ v.play().catch(()=>{}); tryFull(); });
+  v.addEventListener('ended', ()=>{ window.location.href = 'main.html'; });
+})();
+</script>
+</body>
+</html>
