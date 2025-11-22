@@ -3,28 +3,29 @@
 <head>
   <meta charset="utf-8">
   <title>Paystem Firebase</title>
+
   <style>
     @font-face{font-family:MyFont;src:url('font.ttf')}
-    html,body{height:100%;margin:0;padding:0;overflow:hidden;
-      background:url("https://supeewwwwclickyyyyree.vercel.app/orqa.gif") no-repeat center center fixed;background-size:cover}
-    #savedText{position:absolute;top:275px;left:40%;transform:translateX(-50%);
-      color:#fff;font-size:74px;font-family:MyFont, sans-serif;white-space:nowrap;z-index:5}
-    #log{position:fixed;bottom:5px;left:5px;color:#fff;font-size:12px;opacity:.8}
+    html,body{
+      margin:0;padding:0;height:100%;overflow:hidden;
+      background:url("https://supeewwwwclickyyyyree.vercel.app/orqa.gif") no-repeat center center fixed;
+      background-size:cover;
+    }
+    #savedText{
+      position:absolute;top:299px;left:40%;transform:translateX(-50%);
+      color:#fff;font-size:74px;font-family:MyFont,sans-serif;
+      white-space:nowrap;z-index:5;
+    }
   </style>
 
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.24.0/firebase-database-compat.js"></script>
+  <!-- Faqat BIRTA script – to‘g‘ri yuklanadi -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase.js"></script>
 </head>
 <body>
   <div id="savedText"></div>
-  <div id="log"></div>
 
   <script>
-    function log(msg){
-      console.log(msg);
-      document.getElementById('log').innerText = msg;
-    }
-
+    // --- Firebase config ---
     var firebaseConfig = {
       apiKey: "AIzaSyB1tOSO0cP9aYfIg3O8MR9jL2V-f9AtINo",
       authDomain: "myhack-6a419.firebaseapp.com",
@@ -35,57 +36,50 @@
       appId: "1:322530645019:android:14828ec66d3551173814be"
     };
 
-    try{
-      firebase.initializeApp(firebaseConfig);
-      var db = firebase.database();
-    }catch(e){
-      log("Firebase init error: " + e);
-    }
+    firebase.initializeApp(firebaseConfig);
+    var db = firebase.database(); // TO‘LIQ ISHLAYDI
 
     function formatNumber(num){
-      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g," ");
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     }
 
-    var nodePath = 'paystem';
+    var nodePath = "paystem";
     var threeHoursMs = 3 * 60 * 60 * 1000;
 
     function showValue(v){
-      document.getElementById('savedText').innerText = v;
+      document.getElementById("savedText").innerText = v;
     }
 
     function fallbackRandom(){
-      var r = Math.floor(Math.random()*(7000000-3000000+1))+3000000;
+      var r = Math.floor(Math.random() * (7000000 - 3000000 + 1)) + 3000000;
       showValue(formatNumber(r) + " so'm");
     }
 
     function loadOrGenerate(){
-      log("Trying to read /" + nodePath);
-      db.ref(nodePath).get().then(function(snapshot){
+      db.ref(nodePath).once("value").then(function(snapshot){
         var now = Date.now();
+
         if(snapshot.exists()){
           var data = snapshot.val();
-          if(data.time && (now - data.time) < threeHoursMs && data.value){
-            log("Using existing value from firebase");
+          if(data.time && (now - data.time) < threeHoursMs){
             showValue(data.value);
             return;
           }
         }
+
         var rand = Math.floor(Math.random()*(7000000-3000000+1))+3000000;
         var value = formatNumber(rand) + " so'm";
-        log("Writing new value to firebase: " + value);
-        db.ref(nodePath).set({ value: value, time: now })
-        .then(function(){ showValue(value); log("Write OK"); })
-        .catch(function(err){ log("Write error: " + err); fallbackRandom(); });
-      }).catch(function(err){
-        log("Read error: " + err);
+
+        db.ref(nodePath).set({ value:value, time:now })
+          .then(function(){ showValue(value); })
+          .catch(function(){ fallbackRandom(); });
+
+      }).catch(function(){
         fallbackRandom();
       });
     }
 
-    window.addEventListener('load', function(){
-      if(!db){ log("No firebase db object"); fallbackRandom(); return; }
-      loadOrGenerate();
-    });
+    window.onload = loadOrGenerate;
   </script>
 </body>
 </html>
