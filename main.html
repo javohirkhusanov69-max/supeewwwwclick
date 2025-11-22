@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit chek</title>
+  <style>
+    @font-face {
+      font-family: 'MyFont';
+      src: url('font.ttf');
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: url("https://supeewwwwclickyyyyree.vercel.app/orqa.gif") no-repeat center center fixed;
+      background-size: cover;
+    }
+
+    /* --- Text joylash joyi (o'zgartira olasiz) --- */
+    #savedText {
+      position: absolute;
+      top: 275px;
+      left: 40%;
+      transform: translateX(-50%);
+      color: white;
+      font-size: 74px;
+      font-family: 'MyFont', sans-serif;
+      white-space: nowrap;
+      user-select: none;
+      z-index: 5;
+    }
+
+    #textInput {
+      display: none;
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 10px;
+      font-size: 18px;
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Saqlangan text -->
+  <div id="savedText"></div>
+
+  <input type="text" id="textInput" placeholder="Balance yozing..." />
+
+  <script>
+    const savedTextDiv = document.getElementById('savedText');
+    const input = document.getElementById('textInput');
+
+    // LOCAL STORAGE
+    const saved = localStorage.getItem("mySavedText");
+    if (saved) {
+      savedTextDiv.innerText = saved;
+    }
+
+    // Bir marta bosilganda input ochilsin
+    document.body.addEventListener('click', () => {
+      input.style.display = 'block';
+      input.focus();
+    });
+
+    // ENTER bilan saqlash
+    input.addEventListener('keydown', (e) => {
+      if (e.key === "Enter" && input.value.trim() !== "") {
+
+        savedTextDiv.innerText = input.value;
+        localStorage.setItem("mySavedText", input.value);
+
+        input.style.display = 'none';
+        input.value = "";
+      }
+    });
+  </script>
+
+</body>
+</html>
