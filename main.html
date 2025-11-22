@@ -1,65 +1,66 @@
 <!DOCTYPE html>
 <html lang="uz">
 <head>
-  <meta charset="UTF-8">
-  <title>Edit chek</title>
+  <meta charset="utf-8" />
+  <title>Edit chek - Firebase</title>
   <style>
-    @font-face {
-      font-family: 'MyFont';
-      src: url('font.ttf');
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      overflow: hidden;
-      background: url("orqa.gif") no-repeat center center fixed;
-      background-size: cover;
-    }
-
-    #savedText {
-      position: absolute;
-      top: 275px;
-      left: 40%;
-      transform: translateX(-50%);
-      color: white;
-      font-size: 74px;
-      font-family: 'MyFont', sans-serif;
-      white-space: nowrap;
-      user-select: none;
-      z-index: 5;
-    }
+    @font-face{font-family:MyFont;src:url('font.ttf')}
+    html,body{height:100%;margin:0;padding:0;overflow:hidden;
+      background:url("orqa.gif") no-repeat center center fixed;background-size:cover}
+    #savedText{position:absolute;top:275px;left:40%;transform:translateX(-50%);
+      color:#fff;font-size:74px;font-family:MyFont, sans-serif;white-space:nowrap;z-index:5}
   </style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-app.js";
+    import { getDatabase, ref, get, set } from "https://www.gstatic.com/firebasejs/9.24.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyB1tOSO0cP9aYfIg3O8MR9jL2V-f9AtINo",
+      authDomain: "myhack-6a419.firebaseapp.com",
+      databaseURL: "https://myhack-6a419-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "myhack-6a419",
+      storageBucket: "myhack-6a419.firebasestorage.app",
+      messagingSenderId: "322530645019",
+      appId: "1:322530645019:android:14828ec66d3551173814be"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const nodePath = 'paystem';
+    const threeHoursMs = 3 * 60 * 60 * 1000;
+
+    function formatNumber(num){
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g," ");
+    }
+
+    async function loadOrGenerate(){
+      try{
+        const snapshot = await get(ref(db, nodePath));
+        const now = Date.now();
+        if(snapshot.exists()){
+          const data = snapshot.val();
+          if(data.time && (now - data.time) < threeHoursMs && data.value){
+            document.getElementById('savedText').innerText = data.value;
+            return;
+          }
+        }
+        const rand = Math.floor(Math.random() * (7000000 - 3000000 + 1)) + 3000000;
+        const value = formatNumber(rand) + " so'm";
+        await set(ref(db, nodePath), { value: value, time: now });
+        document.getElementById('savedText').innerText = value;
+      }catch(err){
+        console.log("Firebase xato:", err);
+        // fallback: agar Firebase ishlamasa — lokalgina ko'rsatish (auth yoki network muammosi uchun)
+        const rand = Math.floor(Math.random() * (7000000 - 3000000 + 1)) + 3000000;
+        document.getElementById('savedText').innerText = formatNumber(rand) + " so'm";
+      }
+    }
+
+    window.addEventListener('load', ()=>{ loadOrGenerate(); });
+
+  </script>
 </head>
 <body>
-
   <div id="savedText"></div>
-
-  <script>
-    function formatNumber(num) {
-      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
-    }
-
-    const savedData = JSON.parse(localStorage.getItem("randomBalance"));
-    const now = Date.now();
-    const threeHours = 3 * 60 * 60 * 1000;
-
-    let value;
-
-    if (savedData && (now - savedData.time) < threeHours) {
-      value = savedData.value;
-    } else {
-      const randomNum = Math.floor(Math.random() * (7000000 - 3000000 + 1)) + 3000000;
-      value = formatNumber(randomNum) + " + so'm";
-      localStorage.setItem("randomBalance", JSON.stringify({
-        value: value,
-        time: now
-      }));
-    }
-
-    document.getElementById("savedText").innerText = value;
-  </script>
-
 </body>
 </html>
