@@ -18,7 +18,6 @@
       background-size: cover;
     }
 
-    /* --- Text joylash joyi (o'zgartira olasiz) --- */
     #savedText {
       position: absolute;
       top: 275px;
@@ -31,53 +30,35 @@
       user-select: none;
       z-index: 5;
     }
-
-    #textInput {
-      display: none;
-      position: fixed;
-      bottom: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 10px;
-      font-size: 18px;
-      z-index: 10;
-    }
   </style>
 </head>
 <body>
 
-  <!-- Saqlangan text -->
   <div id="savedText"></div>
 
-  <input type="text" id="textInput" placeholder="Balance yozing..." />
-
   <script>
-    const savedTextDiv = document.getElementById('savedText');
-    const input = document.getElementById('textInput');
-
-    // LOCAL STORAGE
-    const saved = localStorage.getItem("mySavedText");
-    if (saved) {
-      savedTextDiv.innerText = saved;
+    function formatNumber(num) {
+      return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ");
     }
 
-    // Bir marta bosilganda input ochilsin
-    document.body.addEventListener('click', () => {
-      input.style.display = 'block';
-      input.focus();
-    });
+    const savedData = JSON.parse(localStorage.getItem("randomBalance"));
+    const now = Date.now();
+    const threeHours = 3 * 60 * 60 * 1000;
 
-    // ENTER bilan saqlash
-    input.addEventListener('keydown', (e) => {
-      if (e.key === "Enter" && input.value.trim() !== "") {
+    let value;
 
-        savedTextDiv.innerText = input.value;
-        localStorage.setItem("mySavedText", input.value);
+    if (savedData && (now - savedData.time) < threeHours) {
+      value = savedData.value;
+    } else {
+      const randomNum = Math.floor(Math.random() * (7000000 - 3000000 + 1)) + 3000000;
+      value = formatNumber(randomNum) + " + so'm";
+      localStorage.setItem("randomBalance", JSON.stringify({
+        value: value,
+        time: now
+      }));
+    }
 
-        input.style.display = 'none';
-        input.value = "";
-      }
-    });
+    document.getElementById("savedText").innerText = value;
   </script>
 
 </body>
